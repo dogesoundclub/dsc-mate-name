@@ -3,9 +3,9 @@ import hardhat from "hardhat";
 async function main() {
     console.log("deploy start")
 
-    const DogeSoundClubSlogan = await hardhat.ethers.getContractFactory("DogeSoundClubSlogan")
-    const slogan = await DogeSoundClubSlogan.deploy()
-    console.log(`DogeSoundClubSlogan address: ${slogan.address}`)
+    const DSCMateName.test = await hardhat.ethers.getContractFactory("DSCMateName.test")
+    const mateName = await DSCMateName.test.deploy()
+    console.log(`DSCMateName.test address: ${mateName.address}`)
 }
 
 main()
