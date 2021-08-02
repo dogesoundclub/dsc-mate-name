@@ -46,33 +46,45 @@ describe("DSCMateName", () => {
     context("new DSCMateName", async () => {
         it("set name", async () => {
             await mate.mint(admin.address, 0);
-            await mateName.set(0, "도지사운드클럽");
-            expect(await mateName.names(0)).to.be.equal("도지사운드클럽");
+            await expect(mateName.set(0, "도지사운드클럽"))
+                .to.emit(mateName, "Set")
+                .withArgs(0, admin.address, "도지사운드클럽")
+            expect((await mateName.record(0, (await mateName.recordCount(0)).sub(1)))[1]).to.be.equal("도지사운드클럽");
         })
-        
+
         it("set name twice", async () => {
             await mate.mint(admin.address, 0);
-            await mateName.set(0, "도지사운드클럽");
-            expect(await mateName.names(0)).to.be.equal("도지사운드클럽");
-            await mateName.set(0, "왈왈");
-            expect(await mateName.names(0)).to.be.equal("왈왈");
+            await expect(mateName.set(0, "도지사운드클럽"))
+                .to.emit(mateName, "Set")
+                .withArgs(0, admin.address, "도지사운드클럽")
+            expect((await mateName.record(0, (await mateName.recordCount(0)).sub(1)))[1]).to.be.equal("도지사운드클럽");
+            await expect(mateName.set(0, "왈왈"))
+                .to.emit(mateName, "Set")
+                .withArgs(0, admin.address, "왈왈")
+            expect((await mateName.record(0, (await mateName.recordCount(0)).sub(1)))[1]).to.be.equal("왈왈");
         })
-        
+
         it("set name twice with token", async () => {
-            
+
             await mate.mint(admin.address, 0);
-            await mateName.set(0, "도지사운드클럽");
-            expect(await mateName.names(0)).to.be.equal("도지사운드클럽");
-            
+            await expect(mateName.set(0, "도지사운드클럽"))
+                .to.emit(mateName, "Set")
+                .withArgs(0, admin.address, "도지사운드클럽")
+            expect((await mateName.record(0, (await mateName.recordCount(0)).sub(1)))[1]).to.be.equal("도지사운드클럽");
+
             await mateName.setToken(token.address);
             await token.mint(admin.address, expandTo18Decimals(200));
             await token.approve(mateName.address, expandTo18Decimals(200));
 
-            await mateName.set(0, "왈왈");
-            expect(await mateName.names(0)).to.be.equal("왈왈");
+            await expect(mateName.set(0, "왈왈"))
+                .to.emit(mateName, "Set")
+                .withArgs(0, admin.address, "왈왈")
+            expect((await mateName.record(0, (await mateName.recordCount(0)).sub(1)))[1]).to.be.equal("왈왈");
 
-            await mateName.set(0, "깽깽");
-            expect(await mateName.names(0)).to.be.equal("깽깽");
+            await expect(mateName.set(0, "깽깽"))
+                .to.emit(mateName, "Set")
+                .withArgs(0, admin.address, "깽깽")
+            expect((await mateName.record(0, (await mateName.recordCount(0)).sub(1)))[1]).to.be.equal("깽깽");
         })
     })
 })

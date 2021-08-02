@@ -12,8 +12,13 @@ contract DSCMateName is Ownable, IDSCMateName {
     IKIP17Enumerable public mate;
     KIP7Burnable public token;
     uint256 public tokenAmountForChanging = 100 * 1e18;
-    
-    mapping(uint256 => string) public names;
+
+    struct Record {
+        address owner;
+        string name;
+        uint256 blockNumber;
+    }
+    mapping(uint256 => Record[]) public records;
 
     constructor(IKIP17Enumerable _mate) public {
         mate = _mate;
@@ -29,10 +34,23 @@ contract DSCMateName is Ownable, IDSCMateName {
 
     function set(uint256 mateId, string calldata name) external {
         require(mate.ownerOf(mateId) == msg.sender);
-        if (bytes(names[mateId]).length != 0 && address(token) != address(0)) {
+        if (records[mateId].length != 0 && address(token) != address(0)) {
             token.burnFrom(msg.sender, tokenAmountForChanging);
         }
-        names[mateId] = name;
-        emit Set(msg.sender, mateId, name);
+        records[mateId].push(Record({
+            owner: msg.sender,
+            name: name,
+            blockNumber: block.number
+        }));
+        emit Set(mateId, msg.sender, name);
+    }
+
+    function recordCount(uint256 mateId) view external returns (uint256) {
+        return records[mateId].length;
+    }
+
+    function record(uint256 mateId, uint256 index) view external returns (address owner, string memory name, uint256 blockNumber) {
+        Record memory r = records[mateId][index];
+        return (r.owner, r.name, r.blockNumber);
     }
 }
