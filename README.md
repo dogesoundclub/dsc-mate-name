@@ -2,7 +2,7 @@
 이제 메이트들에 이름을 붙힐 수 있습니다.
 
 ## Mainnet
-0xe0A08F4e6a07015F04EACF565ab3b71C9e0dD546
+0x12C591fCd89B83704541B1Eac6b4aA18063A6954
 
 ## License
 [MIT](LICENSE)
