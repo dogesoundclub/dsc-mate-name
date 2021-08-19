@@ -58,10 +58,36 @@ describe("DSCMateName", () => {
                 .to.emit(mateName, "Set")
                 .withArgs(0, admin.address, "도지사운드클럽")
             expect((await mateName.record(0, (await mateName.recordCount(0)).sub(1)))[1]).to.be.equal("도지사운드클럽");
+            expect(await mateName.getName(0)).to.be.equal("도지사운드클럽");
             await expect(mateName.set(0, "왈왈"))
                 .to.emit(mateName, "Set")
                 .withArgs(0, admin.address, "왈왈")
             expect((await mateName.record(0, (await mateName.recordCount(0)).sub(1)))[1]).to.be.equal("왈왈");
+            expect(await mateName.getName(0)).to.be.equal("왈왈");
+        })
+
+        it("set name duplicated", async () => {
+            await mate.mint(admin.address, 0);
+            await mate.mint(admin.address, 1);
+
+            console.log(await mateName.exists("도지사운드클럽"));
+            await expect(mateName.set(0, "도지사운드클럽"))
+                .to.emit(mateName, "Set")
+                .withArgs(0, admin.address, "도지사운드클럽")
+
+            console.log(await mateName.exists("도지사운드클럽"));
+            expect((await mateName.record(0, (await mateName.recordCount(0)).sub(1)))[1]).to.be.equal("도지사운드클럽");
+            await expect(mateName.set(1, "도지사운드클럽")).to.reverted;
+            await expect(mateName.set(0, "도지사운드클럽2"))
+                .to.emit(mateName, "Set")
+                .withArgs(0, admin.address, "도지사운드클럽2")
+
+            console.log(await mateName.exists("도지사운드클럽"));
+
+            await expect(mateName.set(1, "도지사운드클럽"))
+                .to.emit(mateName, "Set")
+                .withArgs(1, admin.address, "도지사운드클럽")
+            expect((await mateName.record(1, (await mateName.recordCount(1)).sub(1)))[1]).to.be.equal("도지사운드클럽");
         })
 
         it("set name twice with token", async () => {

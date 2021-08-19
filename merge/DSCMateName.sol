@@ -806,9 +806,11 @@ interface IDSCMateName {
     event Set(uint256 indexed mateId, address indexed owner, string name);
     
     function tokenAmountForChanging() view external returns (uint256);
+    function exists(string calldata name) view external returns (bool);
     function set(uint256 mateId, string calldata name) external;
     function recordCount(uint256 mateId) view external returns (uint256);
     function record(uint256 mateId, uint256 index) view external returns (address owner, string memory name, uint256 blockNumber);
+    function getName(uint256 mateId) view external returns (string memory name);
 }
 
 contract DSCMateName is Ownable, IDSCMateName {
@@ -824,6 +826,7 @@ contract DSCMateName is Ownable, IDSCMateName {
         uint256 blockNumber;
     }
     mapping(uint256 => Record[]) public records;
+    mapping(string => bool) public _exists;
 
     constructor(IKIP17Enumerable _mate) public {
         mate = _mate;
@@ -837,16 +840,29 @@ contract DSCMateName is Ownable, IDSCMateName {
         tokenAmountForChanging = amount;
     }
 
+    function exists(string calldata name) view external returns (bool) {
+        return _exists[name];
+    }
+
     function set(uint256 mateId, string calldata name) external {
         require(mate.ownerOf(mateId) == msg.sender);
-        if (records[mateId].length != 0 && address(token) != address(0)) {
-            token.burnFrom(msg.sender, tokenAmountForChanging);
+        require(_exists[name] != true);
+
+        Record[] storage rs = records[mateId];
+        uint256 length = rs.length;
+        if (length != 0) {
+            if (address(token) != address(0)) {
+                token.burnFrom(msg.sender, tokenAmountForChanging);
+            }
+            _exists[rs[length - 1].name] = false;
         }
-        records[mateId].push(Record({
+
+        rs.push(Record({
             owner: msg.sender,
             name: name,
             blockNumber: block.number
         }));
+        _exists[name] = true;
         emit Set(mateId, msg.sender, name);
     }
 
@@ -857,5 +873,14 @@ contract DSCMateName is Ownable, IDSCMateName {
     function record(uint256 mateId, uint256 index) view external returns (address owner, string memory name, uint256 blockNumber) {
         Record memory r = records[mateId][index];
         return (r.owner, r.name, r.blockNumber);
+    }
+
+    function getName(uint256 mateId) view external returns (string memory name) {
+        uint256 length = records[mateId].length;
+        if (length == 0) {
+            return "";
+        }
+        Record memory r = records[mateId][length.sub(1)];
+        return r.name;
     }
 }

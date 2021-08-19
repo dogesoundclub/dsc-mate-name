@@ -67,4 +67,13 @@ contract DSCMateName is Ownable, IDSCMateName {
         Record memory r = records[mateId][index];
         return (r.owner, r.name, r.blockNumber);
     }
+
+    function getName(uint256 mateId) view external returns (string memory name) {
+        uint256 length = records[mateId].length;
+        if (length == 0) {
+            return "";
+        }
+        Record memory r = records[mateId][length.sub(1)];
+        return r.name;
+    }
 }
